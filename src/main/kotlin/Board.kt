@@ -1,7 +1,7 @@
 data class Board(
     val size: Int,
 ) {
-    val cells = Array(size) {
-        CharArray(size) { EMPTY }
+    var cells = Array(size) {
+        CharArray(size) { Element.EMPTY }
     }
 }

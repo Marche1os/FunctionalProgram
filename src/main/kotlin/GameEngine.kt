@@ -15,6 +15,13 @@ object GameEngine {
         return BoardState(board, 10)
     }
 
+    fun processCascade(board: BoardState) {
+        val matches = Match.findMatches(board.board)
+        Match.removeMatches(board, matches)
+        val newState = Match.fillEmptySpaces(board)
+        processCascade(newState)
+    }
+
     fun draw(board: Board) {
         println("  0 1 2 3 4 5 6 7")
 
