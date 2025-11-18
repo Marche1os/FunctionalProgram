@@ -10,16 +10,26 @@ object GameEngine {
         'F',
     )
 
-    fun initGame(): BoardState {
-        val board = Board(10)
-        return BoardState(board, 10)
-    }
+    fun initGame(
+        boardSize: Int = 0
+    ) = BoardState(
+        board = Board(boardSize),
+        score = 0
+    )
+        .let(Match::fillEmptySpaces)
+        .let(::processCascade)
 
-    fun processCascade(board: BoardState) {
-        val matches = Match.findMatches(board.board)
-        Match.removeMatches(board, matches)
-        val newState = Match.fillEmptySpaces(board)
-        processCascade(newState)
+    fun processCascade(currentState: BoardState): BoardState {
+        val matches = Match.findMatches(currentState.board)
+
+        if (matches.isEmpty()) {
+            return currentState
+        }
+
+        Match.removeMatches(currentState, matches)
+        val newState = Match.fillEmptySpaces(currentState)
+
+        return processCascade(newState)
     }
 
     fun draw(board: Board) {
