@@ -19,18 +19,15 @@ object GameEngine {
         .let(Match::fillEmptySpaces)
         .let(::processCascade)
 
-    fun processCascade(currentState: BoardState): BoardState {
-        val matches = Match.findMatches(currentState.board)
-
-        if (matches.isEmpty()) {
-            return currentState
-        }
-
-        Match.removeMatches(currentState, matches)
-        val newState = Match.fillEmptySpaces(currentState)
-
-        return processCascade(newState)
-    }
+    fun processCascade(currentState: BoardState): BoardState =
+        Match.findMatches(currentState.board)
+            .takeIf { matches -> matches.isNotEmpty() }
+            ?.let { matches ->
+                currentState
+                    .let { currentState -> Match.removeMatches(currentState, matches) }
+                    .let { currentState -> Match.fillEmptySpaces(currentState) }
+                    .let { currentState -> processCascade(currentState) }
+            } ?: currentState
 
     fun draw(board: Board) {
         println("  0 1 2 3 4 5 6 7")
