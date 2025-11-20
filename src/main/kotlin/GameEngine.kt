@@ -10,23 +10,23 @@ object GameEngine {
         'F',
     )
 
-    fun initGame(
-        boardSize: Int = 0
-    ) = BoardState(
-        board = Board(boardSize),
-        score = 0
-    )
-        .let(Match::fillEmptySpaces)
-        .let(::processCascade)
+    fun initGame(boardSize: Int = 0) =
+        BoardState(board = Board(boardSize), score = 0)
+            .let(::fillAndCascade)
+
+    private fun fillAndCascade(initialState: BoardState): BoardState =
+        initialState
+            .let(Match::fillEmptySpaces)
+            .let(::processCascade)
 
     fun processCascade(currentState: BoardState): BoardState =
         Match.findMatches(currentState.board)
-            .takeIf { matches -> matches.isNotEmpty() }
+            .takeIf { it.isNotEmpty() }
             ?.let { matches ->
                 currentState
-                    .let { currentState -> Match.removeMatches(currentState, matches) }
-                    .let { currentState -> Match.fillEmptySpaces(currentState) }
-                    .let { currentState -> processCascade(currentState) }
+                    .let { Match.removeMatches(it, matches) }
+                    .let(Match::fillEmptySpaces)
+                    .let(::processCascade)
             } ?: currentState
 
     fun draw(board: Board) {
