@@ -1,3 +1,4 @@
+import match.Match
 import kotlin.system.exitProcess
 
 object GameEngine {
@@ -20,11 +21,12 @@ object GameEngine {
             .let(::processCascade)
 
     fun processCascade(currentState: BoardState): BoardState =
-        Match.findMatches(currentState.board)
+        Match.findMatches(currentState, LevelGenerator.generateLevelMatches())
             .takeIf { it.isNotEmpty() }
             ?.let { matches ->
                 currentState
                     .let { Match.removeMatches(it, matches) }
+                    .let(Match::applyGravity)
                     .let(Match::fillEmptySpaces)
                     .let(::processCascade)
             } ?: currentState
